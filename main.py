@@ -3,9 +3,18 @@ import matplotlib.pyplot as plt
 import random
 from collections import deque
 
-g = ig.Graph.Erdos_Renyi(n=15, m=30, directed=False, loops=False)
-g.to_directed(mode="acyclic")
-ig.summary(g)
+while True:
+    no_isolated = True
+    g = ig.Graph.Erdos_Renyi(n=15, m=30, directed=False, loops=False)
+    g.to_directed(mode="acyclic")
+    ig.summary(g)
+    for v in g.vs:
+        if len(v.in_edges()) == 0 and len(v.out_edges()) == 0:
+            no_isolated = False
+    if no_isolated:
+        break
+
+
 
 # Simulate message passing through edges
 # Sources (nodes with outgoing edges but no incoming) initiate messages
