@@ -21,6 +21,7 @@ for i in g.vs:
     print(f"Node {i.index}: in_edges={len(i.in_edges())}, out_edges={len(i.out_edges())}")
     if len(i.in_edges()) == 0 and len(i.out_edges()) > 0:
         sources.append(i)
+        lowest[i.index] = i.index  # Initialize lowest with the node's own index for source nodes
         # print(f"Node {i.index} initiates message (source node)")
 # sources = [i for i in g.vs if g.vs[i].in_edges() == 0 and g.vs[i].out_edges() != 0]
 for s in sources:
@@ -36,13 +37,19 @@ while q:
         print(f"Node {node.index} sends message to Node {neighbor}")
         received[neighbor] += 1
         total_messages += 1
-        print(f"Node {neighbor} has received {received[neighbor]} messages")
+        if lowest[neighbor] > lowest[node.index]:
+            lowest[neighbor] = lowest[node.index]
+        # print(f"Node {neighbor} has received {received[neighbor]} messages")
         # If this neighbor has received messages from all incoming edges, enqueue it
-        if received[neighbor] == g.vs[neighbor].in_edges():
-            q.append(neighbor)
+        # print(received[neighbor])
+        # print(len(g.vs[neighbor].in_edges()))
+        if received[neighbor] == len(g.vs[neighbor].in_edges()):
+            print("this is working")
+            q.append(g.vs[neighbor])
 
 print(f"\nMessage passing simulation complete. Total messages sent: {total_messages}")
-
+for i in g.vs:
+    print(f"Node {i.index}: Lowest message received = {lowest[i.index]}")
 # After creating your graph g...
 
 # Iterate through all nodes and get edge information
