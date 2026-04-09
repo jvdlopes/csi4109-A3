@@ -6,7 +6,8 @@ from collections import deque
 def yo_up(g, lowest):
     total_messages = 0
     received = [0] * g.vcount()
-    yes_array = [True] * g.ecount()
+    yes_array_edges = [True] * g.ecount()
+    yes_array_nodes = [0] * g.vcount()
     current_node_array = []
     other_node_array = []
     q = deque()
@@ -25,9 +26,10 @@ def yo_up(g, lowest):
             # print(f"Node {node.index} sends message to Node {neighbor}")
             edge = g.get_eid(neighbor, node.index)
             if lowest[neighbor] == lowest[node.index]:
-                yes_array[edge] = True
+                yes_array_nodes[node.index] += 1
+                yes_array_edges[edge] = True
             else:
-                yes_array[edge] = False
+                yes_array_edges[edge] = False
                 current_node_array.append(node.index)
                 other_node_array.append(neighbor)
                 # print(f"Node {neighbor} sends message to Node {node.index} on edge {edge}")
@@ -51,17 +53,46 @@ def yo_up(g, lowest):
         # for i in range(len(yes_array)):
         #     if yes_array[i] == False:
         #         print(i)
-    print(current_node_array)
-    print(other_node_array)
-    print(yes_array)
+    # print(current_node_array)
+    # print(other_node_array)
+    # print(yes_array_edges)
+    # print(yes_array_nodes)
+
+    
+    for i in range(len(yes_array_nodes)):
+        node = g.vs[i]
+        if yes_array_nodes[i] > 1:
+            for neighbor in g.neighbors(node, mode="in"):
+                edge = g.get_eid(neighbor, node.index)
+                if yes_array_edges[edge] == True:
+                    g.delete_edges(edge)
+                    yes_array_edges.pop(edge)
+                    yes_array_nodes[i] -= 1
+                    if yes_array_nodes[i] == 1:
+                        # print(f"Node {i} has only one incoming edge left, stopping further deletions for this node. edge {edge} is deleted, this is between Node {neighbor} and Node {node.index}")
+                        break
+
+    # print(current_node_array)
+    # print(other_node_array)
+    # print(yes_array_edges)
+    # print(yes_array_nodes)
+
     num_of_deleted = 0
-    for i in range(len(yes_array)):
-        if yes_array[i] == False:
+    for i in range(len(yes_array_edges)):
+        if yes_array_edges[i] == False:
             edge = g.es[i - num_of_deleted]    # get the Edge object
             source = edge.source      # source vertex index
             target = edge.target      # target vertex index
             g.delete_edges(i - num_of_deleted)
             g.add_edges([(target, source)])
+            num_of_deleted += 1
+    
+    num_of_deleted = 0
+    for node in range(len(g.vs)):
+        if len(g.vs[node - num_of_deleted].in_edges()) == 1 and len(g.vs[node - num_of_deleted].out_edges()) == 0:
+            for edge in g.vs[node - num_of_deleted].in_edges():
+                g.delete_edges(edge.index)
+            g.delete_vertices(node - num_of_deleted)
             num_of_deleted += 1
     #     node = g.vs[node_id]
     #     neighbors = []
@@ -79,6 +110,7 @@ def yo_up(g, lowest):
     # for e in g.es:
     #     print(f"Edge {e.index}: Source {e.source} -> Target {e.target}")
     # print(yes_array)
+    print(str(total_messages) + "yo_up")
     fig, ax = plt.subplots()
     ig.plot(
         g,
@@ -91,9 +123,14 @@ def yo_up(g, lowest):
         vertex_label=[str(i) for i in range(g.vcount())],
     )
     plt.show()
-    return total_messages
+    
+    if g.vcount() == 1:
+        return total_messages
+    return total_messages + yo_down(g)
 
 def yo_down(g):
+    if g.vcount() == 1:
+        return 0
     # Simulate message passing through edges
     # Sources (nodes with outgoing edges but no incoming) initiate messages
     # Other nodes wait for messages from all incoming edges before sending
@@ -158,12 +195,15 @@ def yo_down(g):
         
         # print()  # Blank line for readability
         # print(lowest)
+    print(str(total_messages) + "yo_down")
     return total_messages + yo_up(g, lowest)
 
 random.seed(42)
 while True:
     no_isolated = True
     g = ig.Graph.Erdos_Renyi(n=15, m=20, directed=False, loops=False)
+    if not g.is_connected():
+        continue
     g.to_directed(mode="acyclic")
     ig.summary(g)
     for v in g.vs:
@@ -171,8 +211,6 @@ while True:
             no_isolated = False
     if no_isolated:
         break
-
-
 
 
 fig, ax = plt.subplots()
