@@ -247,6 +247,10 @@ yplot2 = []
 xplot = []
 xplot2 = []
 
+# simplified speeds up the code by using the averages from previous runs. Setting simplified to False will make the program take longer but it will then generate new graphs to create new data
+simplified = True
+
+
 answer_20_1 = 0
 for i in range(1000):
     g = generate_dag(20, 20)
@@ -333,11 +337,12 @@ yplot.append(answer_40_3 / 1000)
 xplot.append(40)
 
 answer_40_4 = 3042000
-# answer_40_4 = 0
-# m = (40 * (40 - 1)) // 2
-# for i in range(1000):
-#     g = generate_dag(40, m)
-#     answer_40_4 += yo_down(g)
+if simplified == False:
+    answer_40_4 = 0
+    m = (40 * (40 - 1)) // 2
+    for i in range(1000):
+        g = generate_dag(40, m)
+        answer_40_4 += yo_down(g)
 yplot.append(answer_40_4 / 1000)
 xplot.append(40)
 
@@ -365,11 +370,12 @@ yplot.append(answer_60_3 / 1000)
 xplot.append(60)
 
 answer_60_4 = 6962000
-# answer_60_4 = 0
-# m = (60 * (60 - 1)) // 2
-# for i in range(1000):
-#     g = generate_dag(60, m)
-#     answer_60_4 += yo_down(g)
+if simplified == False:
+    answer_60_4 = 0
+    m = (60 * (60 - 1)) // 2
+    for i in range(1000):
+        g = generate_dag(60, m)
+        answer_60_4 += yo_down(g)
 yplot.append(answer_60_4 / 1000)
 xplot.append(60)
 
@@ -397,11 +403,12 @@ yplot.append(answer_80_3 / 1000)
 xplot.append(80)
 
 answer_80_4 = 12482000
-# answer_80_4 = 0
-# m = (80 * (80 - 1)) // 2
-# for i in range(1000):
-#     g = generate_dag(80, m)
-#     answer_80_4 += yo_down(g)
+if simplified == False:
+    answer_80_4 = 0
+    m = (80 * (80 - 1)) // 2
+    for i in range(1000):
+        g = generate_dag(80, m)
+        answer_80_4 += yo_down(g)
 yplot.append(answer_80_4 / 1000)
 xplot.append(80)
 
@@ -429,11 +436,12 @@ yplot.append(answer_100_3 / 1000)
 xplot.append(100)
 
 answer_100_4 = 19602000
-# answer_100_4 = 0
-# m = (100 * (100 - 1)) // 2
-# for i in range(1000):
-#     g = generate_dag(100, m)
-    # answer_100_4 += yo_down(g)
+if simplified == False:
+    answer_100_4 = 0
+    m = (100 * (100 - 1)) // 2
+    for i in range(1000):
+        g = generate_dag(100, m)
+        answer_100_4 += yo_down(g)
 yplot.append(answer_100_4 / 1000)
 xplot.append(100)
 
