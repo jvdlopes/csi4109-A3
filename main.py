@@ -203,7 +203,16 @@ def yo_down(g):
 def generate_dag(nodes, edges):
     while True:
         no_isolated = True
-        g = ig.Graph.Erdos_Renyi(n=nodes, m=edges, directed=False, loops=False)
+        if edges == nodes:
+            g = ig.Graph.Tree(n=nodes, children=2)
+            while True:
+                rand1 = random.randint(0, nodes - 1)
+                rand2 = random.randint(0, nodes - 1)
+                if rand1 != rand2 and g.are_adjacent(rand1, rand2) == False:
+                    g.add_edges([(min(rand1,rand2), max(rand1,rand2))])
+                    break
+        else:
+            g = ig.Graph.Erdos_Renyi(n=nodes, m=edges, loops=False)
         if not g.is_connected():
             continue
         g.to_directed(mode="acyclic")
@@ -215,7 +224,7 @@ def generate_dag(nodes, edges):
             break
     return g
 
-# g = generate_dag(15, 30)
+# g = generate_dag(15, 15)
 # fig, ax = plt.subplots()
 # ig.plot(
 #     g,
