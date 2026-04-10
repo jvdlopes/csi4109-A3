@@ -9,11 +9,8 @@ def yo_up(g, lowest):
     received = [0] * g.vcount()
     yes_array_edges = [True] * g.ecount()
     yes_array_nodes = [0] * g.vcount()
-    current_node_array = []
-    other_node_array = []
     q = deque()
     sinks = []
-
     for i in g.vs:
         if len(i.out_edges()) == 0 and len(i.in_edges()) > 0:
             sinks.append(i)
@@ -30,11 +27,8 @@ def yo_up(g, lowest):
                 yes_array_edges[edge] = True
             else:
                 yes_array_edges[edge] = False
-                current_node_array.append(node.index)
-                other_node_array.append(neighbor)
             if received[neighbor] == len(g.vs[neighbor].out_edges()):
                 q.append(g.vs[neighbor])
-
     for i in range(len(yes_array_nodes)):
         node = g.vs[i]
         if yes_array_nodes[i] > 1:
@@ -46,7 +40,6 @@ def yo_up(g, lowest):
                     yes_array_nodes[i] -= 1
                     if yes_array_nodes[i] == 1:
                         break
-
     num_of_deleted = 0
     for i in range(len(yes_array_edges)):
         if yes_array_edges[i] == False:
@@ -56,7 +49,6 @@ def yo_up(g, lowest):
             g.delete_edges(i - num_of_deleted)
             g.add_edges([(target, source)])
             num_of_deleted += 1
-
     num_of_deleted = 0
     for node in range(len(g.vs)):
         if len(g.vs[node - num_of_deleted].in_edges()) == 1 and len(g.vs[node - num_of_deleted].out_edges()) == 0:
@@ -64,30 +56,24 @@ def yo_up(g, lowest):
                 g.delete_edges(edge.index)
             g.delete_vertices(node - num_of_deleted)
             num_of_deleted += 1
-
     if g.vcount() == 1:
         return total_messages
-
     return total_messages + yo_down(g)
 
 def yo_down(g):
     if g.vcount() == 1:
         return 0
-
     total_messages = 0
     received = [0] * g.vcount()
     lowest = [float('inf')] * g.vcount()
     q = deque()
     sources = []
-
     for i in g.vs:
         if len(i.in_edges()) == 0 and len(i.out_edges()) > 0:
             sources.append(i)
             lowest[i.index] = i.index
-
     for s in sources:
         q.append(s)
-
     while q:
         node = q.popleft()
         for neighbor in g.neighbors(node, mode="out"):
@@ -97,7 +83,6 @@ def yo_down(g):
                 lowest[neighbor] = lowest[node.index]
             if received[neighbor] == len(g.vs[neighbor].in_edges()):
                 q.append(g.vs[neighbor])
-
     return total_messages + yo_up(g, lowest)
 
 
@@ -123,7 +108,6 @@ def generate_dag(nodes, edges):
                 no_isolated = False
         if no_isolated:
             break
-
     return g
 
 yplot = []
@@ -131,7 +115,7 @@ yplot2 = []
 xplot = []
 xplot2 = []
 
-# simplified speeds up the code by using the averages from previous runs. Turning simplified to false will make the program take longer as it adds a few thousand mor runs of the algorithm, but the new data that is generated will be neraly identical to the current constants.
+# simplified speeds up the code by using the averages from previous runs. Turning simplified to false will make the program take longer as it adds a few thousand more runs of the algorithm, but the new data that is generated will be identical to the current constants.
 simplified = True
 
 
@@ -384,8 +368,14 @@ yplot2.append(answer2_100_1 / 1000)
 xplot2.append(n)
 
 plt.scatter(xplot, yplot, label="m = n, nlogn, nsqrt(n), n^2")
+plt.xlabel("number of nodes (n)")
+plt.ylabel("average message complexity")
+plt.title("Procedure 1:")
 plt.show()
 plt.scatter(xplot2, yplot2, label="m = 2n")
+plt.xlabel("number of nodes (n)")
+plt.ylabel("average message complexity")
+plt.title("Procedure 2:")
 plt.show()
 
 
